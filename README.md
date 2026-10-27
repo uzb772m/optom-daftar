@@ -1,4 +1,4 @@
-# Optom Daftar — Ulgurji Nasiya Daftari
+# Xisob Kitob — Ulgurji Nasiya Daftari
 
 O'zbekistondagi ulgurji ("optom") savdogarlar uchun maxsus ishlab chiqilgan qarz va nasiya daftari tizimi. Qog'oz nasiya daftarining o'rnini to'liq bosadi: haridorlarga tovarlar nasiyaga beriladi, ular qismlab to'lab boradi, tizim esa kimdan qancha qarz borligini, qaysi tovarlar uchun va qachondan beri ekanligini avtomatik hisoblaydi.
 

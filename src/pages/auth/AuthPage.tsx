@@ -82,10 +82,10 @@ export const AuthPage: React.FC = () => {
         {/* App Logo & Title */}
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-2xl mx-auto shadow-xl shadow-blue-500/25 border border-white/10">
-            OD
+            XK
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight">
-            Optom Daftar
+            Xisob Kitob
           </h1>
           <p className="text-xs text-slate-400">
             Ulgurji savdo nasiya va qarz daftari

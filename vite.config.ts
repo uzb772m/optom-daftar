@@ -10,11 +10,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Optom Daftar',
-        short_name: 'OptomDaftar',
-        description: 'Ulgurji savdo nasiya daftari',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        name: 'Xisob Kitob',
+        short_name: 'XisobKitob',
+        description: 'Ulgurji savdo nasiya va qarz daftari',
+        theme_color: '#090d16',
+        background_color: '#090d16',
         display: 'standalone',
         orientation: 'portrait',
         icons: [
