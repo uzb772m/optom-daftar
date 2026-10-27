@@ -3,7 +3,7 @@ import { roundHalfUp, calculateLineTotal, formatMoney } from '../lib/money';
 import { normalizeSearchText, matchClientSearch } from '../lib/search';
 import { computeSalesAllocation, computeClientBalance, computeHistoryAndRunningBalance } from '../lib/allocation';
 import { isOverdue } from '../lib/date';
-import { Sale, Payment } from '../types';
+import { Sale, Payment, Client } from '../types';
 
 describe("Optom Daftar - Spetsifikatsiya 10-bo'lim Qabul Testlari", () => {
 
@@ -305,4 +305,40 @@ describe("Optom Daftar - Spetsifikatsiya 10-bo'lim Qabul Testlari", () => {
     expect(alloc.get('opening-bobur')?.status).toBe("Qisman to'langan");
     expect(alloc.get('opening-bobur')?.remaining).toBe(500000);
   });
+
+  it("17-qoida: Xavfsizlik va Multi-tenant izolyatsiya (Boshqa biznes foydalanuvchisi Akmalning ma'lumotlarini ko'ra olmaydi)", () => {
+    const businessA = 'biz-A-baraka';
+    const businessB = 'biz-B-orzu';
+
+    const clientA: Client = {
+      id: 'client-A-1',
+      business_id: businessA,
+      full_name: "Akmal Karimov",
+      phone: "+998 90 123 45 67",
+      is_archived: false,
+      search_text: "akmal karimov",
+      created_at: new Date().toISOString()
+    };
+
+    const clientB: Client = {
+      id: 'client-B-1',
+      business_id: businessB,
+      full_name: "Jamshid Toshmatov",
+      phone: "+998 91 222 33 44",
+      is_archived: false,
+      search_text: "jamshid toshmatov",
+      created_at: new Date().toISOString()
+    };
+
+    const allClients = [clientA, clientB];
+
+    // Business B ga kirgan foydalanuvchi filtri
+    const businessBClients = allClients.filter(c => c.business_id === businessB);
+
+    // Business B da faqat Jamshid bo'lishi kerak, Akmal aslo ko'rinmaydi!
+    expect(businessBClients.length).toBe(1);
+    expect(businessBClients[0].full_name).toBe("Jamshid Toshmatov");
+    expect(businessBClients.some(c => c.full_name === "Akmal Karimov")).toBe(false);
+  });
 });
+

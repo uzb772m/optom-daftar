@@ -67,9 +67,10 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | null>(null);
 
-const STORAGE_KEY = 'optom_daftar_data_v1';
+import { useAuth } from './auth';
 
-// Initial default demo data based on specification
+const STORAGE_PREFIX = 'optom_data_business_';
+
 const INITIAL_DEMO_BUSINESS: Business = {
   id: 'biz-default',
   name: "Baraka Ulgurji Savdo",
@@ -88,44 +89,60 @@ const INITIAL_DEMO_PRODUCTS: Product[] = [
 ];
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [business, setBusiness] = useState<Business>(INITIAL_DEMO_BUSINESS);
+  const { business: currentAuthBusiness } = useAuth();
+
+  const activeBusiness: Business = currentAuthBusiness || INITIAL_DEMO_BUSINESS;
+  const storageKey = STORAGE_PREFIX + activeBusiness.id;
+
+  const [business, setBusiness] = useState<Business>(activeBusiness);
   const [clients, setClients] = useState<Client[]>([]);
   const [products, setProducts] = useState<Product[]>(INITIAL_DEMO_PRODUCTS);
   const [sales, setSales] = useState<Sale[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
 
-  // Load from local storage or initialize demo
+  // Sync active business whenever auth changes
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    if (currentAuthBusiness) {
+      setBusiness(currentAuthBusiness);
+    }
+  }, [currentAuthBusiness]);
+
+  // Load isolated state for the specific logged-in business
+  useEffect(() => {
+    const raw = localStorage.getItem(storageKey);
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
         if (parsed.business) setBusiness(parsed.business);
-        if (parsed.clients) setClients(parsed.clients);
-        if (parsed.products) setProducts(parsed.products);
-        if (parsed.sales) setSales(parsed.sales);
-        if (parsed.payments) setPayments(parsed.payments);
+        setClients(parsed.clients || []);
+        setProducts(parsed.products || INITIAL_DEMO_PRODUCTS);
+        setSales(parsed.sales || []);
+        setPayments(parsed.payments || []);
       } catch (e) {
         console.error("Local data parse error", e);
-        initDemoData();
+        if (activeBusiness.id === 'biz-default') {
+          initDemoData();
+        } else {
+          setClients([]);
+          setSales([]);
+          setPayments([]);
+        }
       }
     } else {
-      initDemoData();
+      // If it's the demo business, seed demo data; otherwise start with clean account!
+      if (activeBusiness.id === 'biz-default') {
+        initDemoData();
+      } else {
+        setClients([]);
+        setSales([]);
+        setPayments([]);
+        setProducts(INITIAL_DEMO_PRODUCTS);
+      }
     }
+  }, [storageKey, activeBusiness.id]);
 
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  // Save to localStorage whenever state changes
+  // Save to localStorage scoped strictly to this business
   const saveState = (
     b = business,
     c = clients,
@@ -133,7 +150,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     s = sales,
     pay = payments
   ) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    localStorage.setItem(storageKey, JSON.stringify({
       business: b,
       clients: c,
       products: p,

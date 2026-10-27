@@ -3,13 +3,15 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Home, Users, PlusCircle, History, Settings, 
-  WifiOff, ArrowUpRight, TrendingUp, CreditCard 
+  WifiOff, ArrowUpRight, TrendingUp, CreditCard, LogOut 
 } from 'lucide-react';
 import { useStore } from '../../lib/store';
+import { useAuth } from '../../lib/auth';
 
 export const AppLayout: React.FC = () => {
   const { t } = useTranslation();
   const { isOffline, business } = useStore();
+  const { user, signOut } = useAuth();
   const location = useLocation();
 
   return (
@@ -113,10 +115,33 @@ export const AppLayout: React.FC = () => {
           </nav>
         </div>
 
-        {/* Footer info */}
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-400">
-          <p className="font-semibold text-slate-700 dark:text-slate-300">Optom Daftar v1.0</p>
-          <p className="mt-0.5">Ulgurji nasiya tizimi</p>
+        {/* User profile & Logout */}
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+          {user && (
+            <div className="flex items-center justify-between">
+              <div className="overflow-hidden">
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                  {user.full_name || user.email}
+                </p>
+                <p className="text-[10px] text-slate-400 truncate">
+                  {user.email}
+                </p>
+              </div>
+
+              <button
+                onClick={() => signOut()}
+                title="Chiqish"
+                className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <div className="text-[11px] text-slate-400">
+            <p className="font-semibold text-slate-700 dark:text-slate-300">Optom Daftar v1.0</p>
+            <p className="mt-0.5">Ulgurji xavfsiz nasiya tizimi</p>
+          </div>
         </div>
       </aside>
 
